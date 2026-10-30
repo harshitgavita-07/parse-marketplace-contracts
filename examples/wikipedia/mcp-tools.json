@@ -1,0 +1,131 @@
+{
+  "generated_from": "parse-marketplace-public-detail",
+  "schema": "https://modelcontextprotocol.io/schemas/tools",
+  "tools": [
+    {
+      "description": "Full-text search over Wikipedia articles. Returns matching articles ranked by relevance with titles, snippets, word counts, sizes, and timestamps. Paginated via integer offset; each page contains up to `limit` results. The response includes total_hits for the query and next_offset for advancing.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "limit": {
+            "default": 10,
+            "description": "Number of results to return per page (1-50).",
+            "enum": [
+              10,
+              5,
+              20,
+              50
+            ],
+            "type": "integer"
+          },
+          "offset": {
+            "default": 0,
+            "description": "Pagination offset for fetching subsequent pages of results.",
+            "enum": [
+              0
+            ],
+            "type": "integer"
+          },
+          "query": {
+            "description": "Search query string.",
+            "example": "artificial intelligence",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "type": "object"
+      },
+      "name": "wikipedia_api__search_articles",
+      "x-execute": {
+        "auth_header": "X-API-Key",
+        "method": "GET",
+        "url": "https://api.parse.bot/scraper/cabed3f6-f0a2-4ce6-ab14-897da89a04db/search_articles"
+      }
+    },
+    {
+      "description": "Retrieve detailed information about a single Wikipedia article including its text extract, categories, canonical URL, and metadata. Identify the article by page ID or title (at least one required). By default returns the introduction only; set full_extract to 'true' for the complete article text.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "full_extract": {
+            "default": "false",
+            "description": "Set to 'true' to get the full article text instead of just the introduction. Accepted values: 'true', 'false'.",
+            "enum": [
+              "false",
+              "true"
+            ],
+            "type": "string"
+          },
+          "pageid": {
+            "description": "Wikipedia page ID (numeric string, e.g. '23862'). Either pageid or title must be provided.",
+            "example": "23862",
+            "type": "string"
+          },
+          "title": {
+            "description": "Wikipedia article title (e.g. 'Python (programming language)'). Either pageid or title must be provided.",
+            "example": "Python (programming language)",
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "name": "wikipedia_api__get_article_details",
+      "x-execute": {
+        "auth_header": "X-API-Key",
+        "method": "GET",
+        "url": "https://api.parse.bot/scraper/cabed3f6-f0a2-4ce6-ab14-897da89a04db/get_article_details"
+      }
+    },
+    {
+      "description": "List articles, subcategories, or files within a Wikipedia category. Paginated via opaque continuation tokens; the response includes next_continue for advancing. Returns an empty members array if the category has no members of the requested type.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "category": {
+            "default": "Science",
+            "description": "Category name without the 'Category:' prefix (e.g. 'Science', 'Artificial intelligence').",
+            "example": "Science",
+            "type": "string"
+          },
+          "continue": {
+            "description": "Continuation token for pagination, obtained from next_continue in a previous response.",
+            "example": "",
+            "type": "string"
+          },
+          "limit": {
+            "default": 20,
+            "description": "Number of members to return per page (1-50).",
+            "enum": [
+              5,
+              10,
+              20,
+              50
+            ],
+            "type": "integer"
+          },
+          "type": {
+            "default": "page",
+            "description": "Type of members to return. Accepted values: 'page' for articles, 'subcat' for subcategories, 'file' for files.",
+            "enum": [
+              "subcat",
+              "page",
+              "file"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [],
+        "type": "object"
+      },
+      "name": "wikipedia_api__get_category_members",
+      "x-execute": {
+        "auth_header": "X-API-Key",
+        "method": "GET",
+        "url": "https://api.parse.bot/scraper/cabed3f6-f0a2-4ce6-ab14-897da89a04db/get_category_members"
+      }
+    }
+  ]
+}

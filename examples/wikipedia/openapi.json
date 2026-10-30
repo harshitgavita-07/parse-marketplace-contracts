@@ -1,0 +1,475 @@
+{
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "in": "header",
+        "name": "X-API-Key",
+        "type": "apiKey"
+      }
+    }
+  },
+  "info": {
+    "description": "Generated from Parse's public no-auth marketplace detail route. It is a compatibility contract for evaluation, not an official Parse export.",
+    "title": "Wikipedia API (generated contract)",
+    "version": "1.0.0+parse.9"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/scraper/{scraper_id}/get_article_details": {
+      "get": {
+        "operationId": "get_article_details",
+        "parameters": [
+          {
+            "description": "Callable Parse scraper id. The marketplace canonical id is the default.",
+            "in": "path",
+            "name": "scraper_id",
+            "required": true,
+            "schema": {
+              "default": "cabed3f6-f0a2-4ce6-ab14-897da89a04db",
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Wikipedia article title (e.g. 'Python (programming language)'). Either pageid or title must be provided.",
+            "in": "query",
+            "name": "title",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Wikipedia page ID (numeric string, e.g. '23862'). Either pageid or title must be provided.",
+            "in": "query",
+            "name": "pageid",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Set to 'true' to get the full article text instead of just the introduction. Accepted values: 'true', 'false'.",
+            "in": "query",
+            "name": "full_extract",
+            "required": false,
+            "schema": {
+              "default": "false",
+              "enum": [
+                "false",
+                "true"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "properties": {
+                    "data": {
+                      "additionalProperties": true,
+                      "properties": {
+                        "categories": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "content_model": {
+                          "type": "string"
+                        },
+                        "extract": {
+                          "type": "string"
+                        },
+                        "language": {
+                          "type": "string"
+                        },
+                        "last_revision_id": {
+                          "type": "integer"
+                        },
+                        "length": {
+                          "type": "integer"
+                        },
+                        "pageid": {
+                          "type": "integer"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "url": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "categories",
+                        "content_model",
+                        "extract",
+                        "language",
+                        "last_revision_id",
+                        "length",
+                        "pageid",
+                        "title",
+                        "url"
+                      ],
+                      "type": "object"
+                    },
+                    "status": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "status"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Endpoint result"
+          },
+          "401": {
+            "description": "Missing or invalid X-API-Key"
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "summary": "Retrieve detailed information about a single Wikipedia article including its text extract, categories, canonical URL, and metadata. Identify the article by page ID or title (at least one required). By default returns the introduction only; set full_extract to 'true' for the complete article text.",
+        "tags": [
+          "education"
+        ],
+        "x-parse-marketplace": {
+          "canonical_scraper_id": "cabed3f6-f0a2-4ce6-ab14-897da89a04db",
+          "initiates_session": false,
+          "latest_version": 9,
+          "listing_id": "4e241d54-c859-4aec-846d-5ea3159104c7",
+          "price_credits": 1,
+          "slug": "wikipedia-api"
+        }
+      }
+    },
+    "/scraper/{scraper_id}/get_category_members": {
+      "get": {
+        "operationId": "get_category_members",
+        "parameters": [
+          {
+            "description": "Callable Parse scraper id. The marketplace canonical id is the default.",
+            "in": "path",
+            "name": "scraper_id",
+            "required": true,
+            "schema": {
+              "default": "cabed3f6-f0a2-4ce6-ab14-897da89a04db",
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Type of members to return. Accepted values: 'page' for articles, 'subcat' for subcategories, 'file' for files.",
+            "in": "query",
+            "name": "type",
+            "required": false,
+            "schema": {
+              "default": "page",
+              "enum": [
+                "subcat",
+                "page",
+                "file"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "description": "Number of members to return per page (1-50).",
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "enum": [
+                5,
+                10,
+                20,
+                50
+              ],
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Category name without the 'Category:' prefix (e.g. 'Science', 'Artificial intelligence').",
+            "in": "query",
+            "name": "category",
+            "required": false,
+            "schema": {
+              "default": "Science",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Continuation token for pagination, obtained from next_continue in a previous response.",
+            "in": "query",
+            "name": "continue",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "properties": {
+                    "data": {
+                      "additionalProperties": true,
+                      "properties": {
+                        "category": {
+                          "type": "string"
+                        },
+                        "members": {
+                          "items": {
+                            "additionalProperties": true,
+                            "properties": {
+                              "namespace": {
+                                "type": "integer"
+                              },
+                              "pageid": {
+                                "type": "integer"
+                              },
+                              "title": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "namespace",
+                              "pageid",
+                              "title"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "next_continue": {
+                          "type": "string"
+                        },
+                        "type": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "category",
+                        "members",
+                        "next_continue",
+                        "type"
+                      ],
+                      "type": "object"
+                    },
+                    "status": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "status"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Endpoint result"
+          },
+          "401": {
+            "description": "Missing or invalid X-API-Key"
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "summary": "List articles, subcategories, or files within a Wikipedia category. Paginated via opaque continuation tokens; the response includes next_continue for advancing. Returns an empty members array if the category has no members of the requested type.",
+        "tags": [
+          "education"
+        ],
+        "x-parse-marketplace": {
+          "canonical_scraper_id": "cabed3f6-f0a2-4ce6-ab14-897da89a04db",
+          "initiates_session": false,
+          "latest_version": 9,
+          "listing_id": "4e241d54-c859-4aec-846d-5ea3159104c7",
+          "price_credits": 1,
+          "slug": "wikipedia-api"
+        }
+      }
+    },
+    "/scraper/{scraper_id}/search_articles": {
+      "get": {
+        "operationId": "search_articles",
+        "parameters": [
+          {
+            "description": "Callable Parse scraper id. The marketplace canonical id is the default.",
+            "in": "path",
+            "name": "scraper_id",
+            "required": true,
+            "schema": {
+              "default": "cabed3f6-f0a2-4ce6-ab14-897da89a04db",
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Number of results to return per page (1-50).",
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 10,
+              "enum": [
+                10,
+                5,
+                20,
+                50
+              ],
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Search query string.",
+            "in": "query",
+            "name": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Pagination offset for fetching subsequent pages of results.",
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "enum": [
+                0
+              ],
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "properties": {
+                    "data": {
+                      "additionalProperties": true,
+                      "properties": {
+                        "articles": {
+                          "items": {
+                            "additionalProperties": true,
+                            "properties": {
+                              "pageid": {
+                                "type": "integer"
+                              },
+                              "size": {
+                                "type": "integer"
+                              },
+                              "snippet": {
+                                "type": "string"
+                              },
+                              "timestamp": {
+                                "type": "string"
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "wordcount": {
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "pageid",
+                              "size",
+                              "snippet",
+                              "timestamp",
+                              "title",
+                              "wordcount"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "next_offset": {
+                          "type": "integer"
+                        },
+                        "offset": {
+                          "type": "integer"
+                        },
+                        "query": {
+                          "type": "string"
+                        },
+                        "total_hits": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "articles",
+                        "next_offset",
+                        "offset",
+                        "query",
+                        "total_hits"
+                      ],
+                      "type": "object"
+                    },
+                    "status": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "status"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Endpoint result"
+          },
+          "401": {
+            "description": "Missing or invalid X-API-Key"
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "summary": "Full-text search over Wikipedia articles. Returns matching articles ranked by relevance with titles, snippets, word counts, sizes, and timestamps. Paginated via integer offset; each page contains up to `limit` results. The response includes total_hits for the query and next_offset for advancing.",
+        "tags": [
+          "education"
+        ],
+        "x-parse-marketplace": {
+          "canonical_scraper_id": "cabed3f6-f0a2-4ce6-ab14-897da89a04db",
+          "initiates_session": false,
+          "latest_version": 9,
+          "listing_id": "4e241d54-c859-4aec-846d-5ea3159104c7",
+          "price_credits": 1,
+          "slug": "wikipedia-api"
+        }
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.parse.bot"
+    }
+  ]
+}

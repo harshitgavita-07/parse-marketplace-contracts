@@ -1,0 +1,13 @@
+{
+  "endpoint_count": 3,
+  "errors": [],
+  "info": [
+    "last_verified_at=2026-10-29T15:47:46.369223+00:00",
+    "latest_version=9"
+  ],
+  "ok": true,
+  "unauthenticated_openapi_status": 401,
+  "warnings": [
+    "sdk_delivery_state is 'absent'; generated SDK fills the public listing gap"
+  ]
+}

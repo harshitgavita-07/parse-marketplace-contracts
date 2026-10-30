@@ -1,0 +1,557 @@
+{
+  "access_requirements": [],
+  "apis": [
+    {
+      "description": "Full-text search over Wikipedia articles. Returns matching articles ranked by relevance with titles, snippets, word counts, sizes, and timestamps. Paginated via integer offset; each page contains up to `limit` results. The response includes total_hits for the query and next_offset for advancing.",
+      "endpoint_name": "search_articles",
+      "initiates_session": false,
+      "input_params": {
+        "limit": {
+          "default": 10,
+          "description": "Number of results to return per page (1-50).",
+          "domain": {
+            "generator": {
+              "strategy": "first",
+              "type": "enum_pick"
+            },
+            "kind": "enum",
+            "values": [
+              10,
+              5,
+              20,
+              50
+            ]
+          },
+          "required": false,
+          "type": "integer"
+        },
+        "offset": {
+          "default": 0,
+          "description": "Pagination offset for fetching subsequent pages of results.",
+          "domain": {
+            "generator": {
+              "strategy": "first",
+              "type": "enum_pick"
+            },
+            "kind": "enum",
+            "values": [
+              0
+            ]
+          },
+          "required": false,
+          "type": "integer"
+        },
+        "query": {
+          "description": "Search query string.",
+          "domain": {
+            "example": "artificial intelligence",
+            "generator": {
+              "type": "static",
+              "value": "artificial intelligence"
+            },
+            "kind": "open"
+          },
+          "required": true,
+          "type": "string"
+        }
+      },
+      "method": "GET",
+      "price": 1,
+      "return_schema": {
+        "fields": {
+          "articles": "array of article summaries each containing pageid, title, snippet, size, wordcount, and timestamp",
+          "next_offset": "integer offset for the next page, or null if no more pages",
+          "offset": "integer current pagination offset",
+          "query": "search query string that was used",
+          "total_hits": "integer total number of matching articles"
+        },
+        "sample": {
+          "data": {
+            "articles": [
+              {
+                "pageid": 1164,
+                "size": 271608,
+                "snippet": "Artificial intelligence (AI) is the capability of computational systems to perform tasks typically associated with human intelligence, such as learning",
+                "timestamp": "2026-06-10T15:13:30Z",
+                "title": "Artificial intelligence",
+                "wordcount": 26939
+              }
+            ],
+            "next_offset": 5,
+            "offset": 0,
+            "query": "artificial intelligence",
+            "total_hits": 27884
+          },
+          "status": "success"
+        },
+        "type": "object"
+      },
+      "verification": {
+        "assertions": [
+          {
+            "op": "equals",
+            "path": "$.status",
+            "value": "success"
+          },
+          {
+            "op": "array_min_len",
+            "path": "$.data.articles",
+            "value": 1
+          },
+          {
+            "op": "not_null",
+            "path": "$.data.total_hits"
+          },
+          {
+            "op": "not_null",
+            "path": "$.data.articles[0].title"
+          }
+        ],
+        "empty_is_valid": false,
+        "recipe_version": 1
+      }
+    },
+    {
+      "description": "Retrieve detailed information about a single Wikipedia article including its text extract, categories, canonical URL, and metadata. Identify the article by page ID or title (at least one required). By default returns the introduction only; set full_extract to 'true' for the complete article text.",
+      "endpoint_name": "get_article_details",
+      "initiates_session": false,
+      "input_params": {
+        "full_extract": {
+          "closed": true,
+          "default": "false",
+          "description": "Set to 'true' to get the full article text instead of just the introduction. Accepted values: 'true', 'false'.",
+          "domain": {
+            "generator": {
+              "strategy": "first",
+              "type": "enum_pick"
+            },
+            "kind": "enum",
+            "values": [
+              "false",
+              "true"
+            ]
+          },
+          "enum": "FullExtract",
+          "required": false,
+          "type": "string"
+        },
+        "pageid": {
+          "description": "Wikipedia page ID (numeric string, e.g. '23862'). Either pageid or title must be provided.",
+          "domain": {
+            "example": "23862",
+            "generator": {
+              "type": "static",
+              "value": "23862"
+            },
+            "kind": "open"
+          },
+          "required": false,
+          "type": "string"
+        },
+        "title": {
+          "description": "Wikipedia article title (e.g. 'Python (programming language)'). Either pageid or title must be provided.",
+          "domain": {
+            "example": "Python (programming language)",
+            "generator": {
+              "type": "static",
+              "value": "Python (programming language)"
+            },
+            "kind": "open"
+          },
+          "required": false,
+          "type": "string"
+        }
+      },
+      "method": "GET",
+      "price": 1,
+      "return_schema": {
+        "fields": {
+          "categories": "array of category name strings the article belongs to",
+          "content_model": "content model type string (e.g. 'wikitext')",
+          "extract": "article text content (intro only by default, full if full_extract is 'true')",
+          "language": "article language code (e.g. 'en')",
+          "last_revision_id": "integer ID of the most recent revision",
+          "length": "integer article length in bytes",
+          "pageid": "integer Wikipedia page ID",
+          "title": "article title",
+          "url": "full canonical URL to the Wikipedia article"
+        },
+        "sample": {
+          "data": {
+            "categories": [
+              "Programming languages",
+              "Python (programming language)"
+            ],
+            "content_model": "wikitext",
+            "extract": "Python is a high-level, general-purpose programming language...",
+            "language": "en",
+            "last_revision_id": 1358757939,
+            "length": 145567,
+            "pageid": 23862,
+            "title": "Python (programming language)",
+            "url": "https://en.wikipedia.org/wiki/Python_(programming_language)"
+          },
+          "status": "success"
+        },
+        "type": "object"
+      },
+      "verification": {
+        "assertions": [
+          {
+            "op": "equals",
+            "path": "$.status",
+            "value": "success"
+          },
+          {
+            "op": "not_null",
+            "path": "$.data.title"
+          },
+          {
+            "op": "not_null",
+            "path": "$.data.pageid"
+          },
+          {
+            "op": "not_null",
+            "path": "$.data.extract"
+          },
+          {
+            "op": "not_null",
+            "path": "$.data.url"
+          }
+        ],
+        "empty_is_valid": false,
+        "recipe_version": 1
+      }
+    },
+    {
+      "description": "List articles, subcategories, or files within a Wikipedia category. Paginated via opaque continuation tokens; the response includes next_continue for advancing. Returns an empty members array if the category has no members of the requested type.",
+      "endpoint_name": "get_category_members",
+      "initiates_session": false,
+      "input_params": {
+        "category": {
+          "default": "Science",
+          "description": "Category name without the 'Category:' prefix (e.g. 'Science', 'Artificial intelligence').",
+          "domain": {
+            "example": "Science",
+            "generator": {
+              "type": "static",
+              "value": "Science"
+            },
+            "kind": "open"
+          },
+          "required": false,
+          "type": "string"
+        },
+        "continue": {
+          "description": "Continuation token for pagination, obtained from next_continue in a previous response.",
+          "domain": {
+            "example": "",
+            "generator": {
+              "type": "static",
+              "value": ""
+            },
+            "kind": "open"
+          },
+          "required": false,
+          "type": "string"
+        },
+        "limit": {
+          "default": 20,
+          "description": "Number of members to return per page (1-50).",
+          "domain": {
+            "generator": {
+              "strategy": "first",
+              "type": "enum_pick"
+            },
+            "kind": "enum",
+            "values": [
+              5,
+              10,
+              20,
+              50
+            ]
+          },
+          "required": false,
+          "type": "integer"
+        },
+        "type": {
+          "default": "page",
+          "description": "Type of members to return. Accepted values: 'page' for articles, 'subcat' for subcategories, 'file' for files.",
+          "domain": {
+            "generator": {
+              "strategy": "first",
+              "type": "enum_pick"
+            },
+            "kind": "enum",
+            "values": [
+              "subcat",
+              "page",
+              "file"
+            ]
+          },
+          "enum": "MemberType",
+          "required": false,
+          "type": "string"
+        }
+      },
+      "method": "GET",
+      "price": 1,
+      "return_schema": {
+        "fields": {
+          "category": "category name with 'Category:' prefix",
+          "members": "array of category members each containing pageid, title, and namespace",
+          "next_continue": "opaque continuation token for the next page, or null if no more results",
+          "type": "member type that was requested ('page', 'subcat', or 'file')"
+        },
+        "sample": {
+          "data": {
+            "category": "Category:Science",
+            "members": [
+              {
+                "namespace": 14,
+                "pageid": 62578579,
+                "title": "Branches of science"
+              },
+              {
+                "namespace": 14,
+                "pageid": 3981960,
+                "title": "Scientific disciplines"
+              }
+            ],
+            "next_continue": "subcat|0a9403064a5246502a503a46444e04344c4642044e2e3a32442e32011d01c4dc1a|63133822",
+            "type": "subcat"
+          },
+          "status": "success"
+        },
+        "type": "object"
+      },
+      "verification": {
+        "assertions": [
+          {
+            "op": "equals",
+            "path": "$.status",
+            "value": "success"
+          },
+          {
+            "op": "array_min_len",
+            "path": "$.data.members",
+            "value": 1
+          },
+          {
+            "op": "not_null",
+            "path": "$.data.category"
+          }
+        ],
+        "empty_is_valid": false,
+        "recipe_version": 1
+      }
+    }
+  ],
+  "canonical_scraper_id": "cabed3f6-f0a2-4ce6-ab14-897da89a04db",
+  "contributes_to_marketplace": true,
+  "description": "Search Wikipedia and instantly access full article content on any topic, then explore related articles by browsing through Wikipedia categories. Retrieve article metadata, extracts, and navigate curated category trees to discover connected subjects.",
+  "endpoint_health": [
+    {
+      "endpoint_name": "search_articles",
+      "last_checked_at": "2026-10-29T15:47:46.369223+00:00",
+      "last_verified_at": "2026-10-29T15:47:46.369223+00:00",
+      "recent_runs": [
+        {
+          "at": "2026-10-28T07:03:52.963809+00:00",
+          "status": "healthy"
+        },
+        {
+          "at": "2026-10-28T05:00:25.635354+00:00",
+          "status": "healthy"
+        },
+        {
+          "at": "2026-10-24T00:02:52.989568+00:00",
+          "status": "healthy"
+        },
+        {
+          "at": "2026-10-17T05:02:52.872408+00:00",
+          "status": "healthy"
+        },
+        {
+          "at": "2026-10-17T04:01:52.871263+00:00",
+          "status": "ambiguous"
+        }
+      ],
+      "status": "healthy"
+    },
+    {
+      "endpoint_name": "get_article_details",
+      "last_checked_at": "2026-10-28T10:03:01.32852+00:00",
+      "last_verified_at": "2026-10-28T10:03:01.32852+00:00",
+      "recent_runs": [
+        {
+          "at": "2026-10-28T07:03:52.963809+00:00",
+          "status": "healthy"
+        },
+        {
+          "at": "2026-10-28T05:00:25.635354+00:00",
+          "status": "healthy"
+        },
+        {
+          "at": "2026-10-24T00:02:52.989568+00:00",
+          "status": "healthy"
+        },
+        {
+          "at": "2026-10-17T05:02:52.872408+00:00",
+          "status": "healthy"
+        },
+        {
+          "at": "2026-10-17T04:01:52.871263+00:00",
+          "status": "ambiguous"
+        }
+      ],
+      "status": "healthy"
+    },
+    {
+      "endpoint_name": "get_category_members",
+      "last_checked_at": "2026-10-28T07:03:52.963809+00:00",
+      "last_verified_at": "2026-10-28T07:03:52.963809+00:00",
+      "recent_runs": [
+        {
+          "at": "2026-10-28T07:03:52.963809+00:00",
+          "status": "healthy"
+        },
+        {
+          "at": "2026-10-28T05:00:25.635354+00:00",
+          "status": "healthy"
+        },
+        {
+          "at": "2026-10-24T00:02:52.989568+00:00",
+          "status": "healthy"
+        },
+        {
+          "at": "2026-10-17T05:02:52.872408+00:00",
+          "status": "healthy"
+        },
+        {
+          "at": "2026-10-17T04:01:52.871263+00:00",
+          "status": "healthy"
+        }
+      ],
+      "status": "healthy"
+    }
+  ],
+  "front_facing_description": "Search Wikipedia and instantly access full article content on any topic, then explore related articles by browsing through Wikipedia categories. Retrieve article metadata, extracts, and navigate curated category trees to discover connected subjects.",
+  "id": "4e241d54-c859-4aec-846d-5ea3159104c7",
+  "is_authenticated": false,
+  "last_verified_at": "2026-10-29T15:47:46.369223+00:00",
+  "latest_version": 9,
+  "name": "Wikipedia API",
+  "pinned_version": null,
+  "prefill_inputs": {
+    "get_article_details": {
+      "full_extract": "false",
+      "pageid": "23862",
+      "title": "Python (programming language)"
+    },
+    "get_category_members": {
+      "category": "Science",
+      "continue": "",
+      "limit": "5",
+      "type": "subcat"
+    },
+    "search_articles": {
+      "limit": "10",
+      "offset": "0",
+      "query": "artificial intelligence"
+    }
+  },
+  "primary_category": "education",
+  "sample_inputs": {
+    "get_article_details": {
+      "full_extract": "false",
+      "pageid": "23862",
+      "title": "Python (programming language)"
+    },
+    "get_category_members": {
+      "category": "Science",
+      "limit": "5",
+      "type": "subcat"
+    },
+    "search_articles": {
+      "limit": "10",
+      "offset": "0",
+      "query": "artificial intelligence"
+    }
+  },
+  "sdk_delivery_state": "absent",
+  "sdk_usage_example": null,
+  "secondary_categories": [
+    "news_media",
+    "developer_tools"
+  ],
+  "seo_content": {
+    "faqs": [
+      {
+        "a": "Yes. Wikipedia exposes the MediaWiki Action API at https://www.mediawiki.org/wiki/API:Main_page, as well as the REST-based Wikimedia REST API at https://en.wikipedia.org/api/rest_v1/. Both are publicly documented and free to use directly.",
+        "q": "Does Wikipedia have an official developer API?"
+      },
+      {
+        "a": "By default, the `extract` field contains only the introductory section of the article. Setting `full_extract` to `'true'` replaces that with the complete article text. All other response fields — `url`, `title`, `length`, `pageid`, `language`, `categories`, `content_model`, and `last_revision_id` — are returned regardless of that parameter.",
+        "q": "What does `get_article_details` return by default versus with `full_extract: 'true'`?"
+      },
+      {
+        "a": "The `language` field is returned in `get_article_details` responses, but the current endpoints are scoped to English Wikipedia. Non-English Wikipedia editions are not covered. You can fork this API on Parse and revise it to target a different language edition.",
+        "q": "Does the API cover languages other than English?"
+      },
+      {
+        "a": "Not currently. The API exposes only the `last_revision_id` for the current article state; full revision history and diff data are not available through these endpoints. You can fork this API on Parse and revise it to add a revision-history endpoint.",
+        "q": "Can I retrieve article revision history or diff data?"
+      },
+      {
+        "a": "`search_articles` uses an integer `offset` that you read from `next_offset` in each response. `get_category_members` uses an opaque string token: read `next_continue` from one response and pass it as the `continue` parameter in the next. Both return a `null` sentinel when no further pages exist. `get_article_details` is a single-record lookup and has no pagination.",
+        "q": "How does pagination work across the three endpoints, and are the mechanisms consistent?"
+      }
+    ],
+    "generated_at": "2026-05-21T21:33:21.403547+00:00",
+    "generated_with_model": "global.anthropic.claude-sonnet-4-6",
+    "keywords": [
+      "wikipedia article api",
+      "wikipedia full text extraction api",
+      "mediawiki search api",
+      "wikipedia category tree api",
+      "get wikipedia article by title",
+      "wikipedia pageid lookup",
+      "wikipedia article metadata api",
+      "wikipedia keyword search json",
+      "browse wikipedia categories programmatically",
+      "wikipedia article word count api",
+      "wikipedia revision id api",
+      "encyclopedia content api",
+      "wikipedia extract api",
+      "wiki article scraper api",
+      "wikipedia article categories endpoint"
+    ],
+    "lead_paragraph": "The Wikipedia API provides 3 endpoints that cover article search, detailed content retrieval, and category browsing across the entirety of English Wikipedia. `search_articles` returns ranked results with snippets, word counts, and timestamps. `get_article_details` returns the full article extract, categories, revision ID, and byte length by either title or page ID. `get_category_members` lets you walk the category tree with typed pagination.",
+    "long_description_md": "## Endpoints and What They Return\n\nThe `search_articles` endpoint accepts a `query` string and returns an `articles` array where each item includes `pageid`, `title`, `snippet`, `size`, `wordcount`, and `timestamp`. The `total_hits` field tells you how many results exist across all pages, and `next_offset` provides a direct value to pass into the `offset` parameter for the next page. Results are limited to a maximum of 50 per call.\n\n## Article Details\n\n`get_article_details` requires either a `title` (e.g., `'Artificial intelligence'`) or a `pageid` (e.g., `'21721040'`). By default it returns the introductory extract only; set `full_extract` to `'true'` to retrieve the complete article text. The response includes `url`, `length` in bytes, `language`, `last_revision_id`, `content_model`, and a `categories` array listing every category the article belongs to.\n\n## Browsing Category Trees\n\n`get_category_members` accepts a `category` name without the `Category:` prefix and returns up to 50 members per call. The `type` parameter controls what is returned: `'page'` for articles, `'subcat'` for subcategories, or `'file'` for media files. Each member object contains `pageid`, `title`, and `namespace`. Pagination is token-based: the `next_continue` field from one response is passed as the `continue` parameter in the next call, and is `null` when no further results exist.",
+    "meta_description": "Search Wikipedia articles, retrieve full text and metadata, and browse category trees via 3 structured endpoints. JSON responses with pageid, extract, and categories.",
+    "meta_title": "Wikipedia API – Search & Article Data",
+    "primary_category": "education",
+    "schema_version": 2,
+    "secondary_categories": [
+      "news_media",
+      "developer_tools"
+    ],
+    "use_cases": [
+      "Build a knowledge base ingestion pipeline using `full_extract` to pull complete article text by title.",
+      "Populate autocomplete or search suggestions using `search_articles` with `snippet` and `title` fields.",
+      "Map topic hierarchies by recursively calling `get_category_members` with `type: 'subcat'`.",
+      "Cross-reference article freshness using the `timestamp` from search results and `last_revision_id` from article details.",
+      "Resolve ambiguous entity names to canonical Wikipedia `pageid` values for use in downstream data pipelines.",
+      "Enumerate all articles within a subject area (e.g., 'Machine learning') by paginating through `get_category_members` with `type: 'page'`.",
+      "Collect structured metadata — word count, byte length, language, content model — for corpus analysis."
+    ]
+  },
+  "slug": "wikipedia-api",
+  "source_url": "https://Wikipedia.org",
+  "summary": "Search and retrieve Wikipedia articles, access detailed article content and metadata, and browse category trees across any topic.",
+  "updated_at": "2026-10-17T04:16:39.709623+00:00",
+  "user_scraper_id": null,
+  "user_status": null,
+  "user_variants": []
+}

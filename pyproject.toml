@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "parse-marketplace-contracts"
+version = "0.1.0"
+description = "Generate OpenAPI, MCP tools, contract reports, and Python SDKs from public Parse Marketplace listings"
+requires-python = ">=3.10"
+readme = "README.md"
+license = {text = "MIT"}
+
+[project.scripts]
+parse-contracts = "parse_contracts.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["parse_contracts*"]
